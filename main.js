@@ -1,7 +1,6 @@
 // By JunM。
 // Please refer to Readme.md
 
-// let app = require("scripts/app");
 let piexif = require("scripts/piexif");
 let utils = require("scripts/utils");
 let htmlLoadingTemplate = $file.read("/assets/html/loading.html").string;
@@ -23,32 +22,9 @@ let rcHex = ("00" + ((color_jsbox.runtimeValue().invoke("redComponent") * 255).t
 let gcHex = ("00" + ((color_jsbox.runtimeValue().invoke("greenComponent") * 255).toString(16))).split(".")[0].slice(-2,);
 let bcHex = ("00" + ((color_jsbox.runtimeValue().invoke("blueComponent") * 255).toString(16))).split(".")[0].slice(-2,);
 let colorHex = `#${rcHex}${gcHex}${bcHex}`;
-// console.log(htmlLoadingTemplate);
 console.log(colorHex);
-htmlLoadingTemplate = htmlLoadingTemplate.replace(/background-color-to-be-replaced/, colorHex);
-// console.log(htmlLoadingTemplate);
+htmlLoadingTemplate = htmlLoadingTemplate.replace(/backgroundColorToBeReplaced/, colorHex);
 
-
-// let in_jpg = $file.read("/assets/in.jpg");
-// console.log(in_jpg);
-
-// app.sayHello();
-
-// let imageData = in_jpg;
-// console.log(typeof imageData);
-// console.log(imageData);
-//
-// imageData = "data:image/jpg;base64," + $text.base64Encode(imageData);
-// console.log(imageData);
-
-
-// exifObjOriginal = piexif.load(imageData);
-// console.log(exifObjOriginal);
-// console.log(exifObjOriginal["0th"]);
-// console.log($text.base64Decode(imageData.substring(22,)));
-
-
-// $app.close();
 
 const loadingFileView = {
     props: {
@@ -129,17 +105,15 @@ function query_tiny_jpg_key() {
 
             $ui.alert({
                 // TODO i18n
-                title: "没有检测到 KEY",
-                message: "脚本调用 TinyJPG 的 API 进行图片压缩，KEY 是免费获取的，\n一个 KEY 每个月可以压缩 500 张照片，\n" +
-                    "每月重置使用量，\n如果有更多需求，可以考虑注册多个 KEY。\n\n\n1、填写名字（随意填写）、自己的邮箱即可\n" +
-                    "2、通过邮箱收到的链接查看自己的 KEY",
+                title: $l10n("KEY Not Found"),
+                message: $l10n("The PhotoCompress script uses piexif to process exif info and uses tinyJPG(also known as tinyPNG) to compress photos. You can compress JPG JPEG and PNG. If you choose a 'photo', your exif info will be saved, so your timeline will not be messed up."),
                 actions: [
                     {
-                        title: "我已经有 Key 了",
+                        title: $l10n("I Have The Key"),
                         handler: function () {
                             // let user input key.
                             $input.text({
-                                placeholder: `请输入 TinyJPG 的 KEY`,
+                                placeholder: $l10n("Input The Key (If You Have)"),
                                 handler: function (text) {
                                     let apiKeyInput = text;
                                     $cache.set("userData", {
@@ -151,7 +125,7 @@ function query_tiny_jpg_key() {
                         }
                     },
                     {
-                        title: "跳转到 TinyJPG 网站 KEY 获取页面",
+                        title: $l10n("Jump To TinyJPG And Apply (Free)"),
                         handler: function () {
                             // Jump to TinyJPG Page.
                             $delay(0.5, function () {
@@ -162,7 +136,7 @@ function query_tiny_jpg_key() {
                         }
                     },
                     {
-                        title: "取消",
+                        title: $l10n("Cancel"),
                         handler: function () {
                             stopScript();
                         }
@@ -182,7 +156,6 @@ function query_tiny_jpg_key() {
 // Save compressed photo (with exif)
 function compressPhoto(originalPhotoData) {
     return new Promise(function (resolve, reject) {
-        // $ui.toast("正在上传图片至 TinyPNG……", 60);
         $ui.render(uploadingView);
         $http.request({
             method: "POST",
@@ -194,9 +167,7 @@ function compressPhoto(originalPhotoData) {
             handler: function (resp) {
                 let response = resp.response;
                 if (response.statusCode === 201 || response.statusCode === 200) {
-                    // $ui.toast("正在压缩……", 30);
                     let compressedImageUrl = response.headers["Location"];
-                    // $ui.toast("正在下载压缩后的图片……", 60);
                     $ui.render(downloadingView);
                     $http.download({
                         url: compressedImageUrl,
@@ -227,8 +198,8 @@ function compressPhoto(originalPhotoData) {
                                             }
 
                                             $push.schedule({
-                                                title: "压缩完成",
-                                                body: "已保存至相册，使用 3D Touch 预览。  \n" + "本 KEY 本月已用：" + response.headers["compression-count"] + " / 500",
+                                                title: $l10n("Compression Complete"),
+                                                body: $l10n("Saved To Album, Use 3D Touch To Preview.") + "\n" + $l10n("Key Usage This Month: ") + response.headers["compression-count"] + " / 500",
                                                 id: "generalNotificationIdByJunM",
                                                 sound: "string",
                                                 attachments: ["RESULT." + imageFormat.toUpperCase()],
@@ -243,8 +214,8 @@ function compressPhoto(originalPhotoData) {
 
                                             if (parseInt(response.headers["compression-count"]) >= 480) {
                                                 $push.schedule({
-                                                    title: "用量提示",
-                                                    body: "本 KEY 本月已用：" + response.headers["compression-count"] + " / 500" + "\n请尽快更换为新 KEY" + "当前 KEY 为：" + userData.apiKey,
+                                                    title: $l10n("Usage Warning"),
+                                                    body: $l10n("Key Usage This Month: ") + response.headers["compression-count"] + " / 500" + "\n" + $l10n("Please Change Your Key.") + $l10n("The Current Key:") + userData.apiKey,
                                                     id: null,
                                                     sound: "string",
                                                     mute: false,
@@ -274,12 +245,12 @@ function compressPhoto(originalPhotoData) {
                 } else if (response.statusCode === 401) {
 
                     $ui.alert({
-                        title: "验证失败",
-                        message: "请确认 API KEY 填写正确，如果有误，可以清除本脚本的缓存，重新输入。\n\n当前填写的 KEY 为：\n\n"
+                        title: $l10n("Verification Failed"),
+                        message: $l10n("Please make sure you have input the right key. Clear the script cache and input again if necessary.") + "\n\n" + $l10n("The Current Key:") + "\n\n"
                             + userData.apiKey,
                         actions: [
                             {
-                                title: "清除已存储的 KEY",
+                                title: $l10n("Clear Saved Key"),
                                 handler: function () {
                                     $cache.set("userData", {
                                         "apiKey": null,
@@ -288,7 +259,7 @@ function compressPhoto(originalPhotoData) {
                                 }
                             },
                             {
-                                title: "取消",
+                                title: $l10n("Cancel"),
                                 handler: function () {
                                     stopScript();
                                 }
@@ -299,12 +270,12 @@ function compressPhoto(originalPhotoData) {
                 } else if (response.statusCode === 429) {
 
                     $ui.alert({
-                        title: "验证失败",
-                        message: "错误码 429，当前的 KEY 本月使用次数已经达到上限。\n\n当前填写的 KEY 为：\n\n"
+                        title: $l10n("Verification Failed"),
+                        message: $l10n("Error code 429. Key usage 500 / 500. Please change the key.") + "\n\n" + $l10n("The Current Key:") + "\n\n"
                             + userData.apiKey,
                         actions: [
                             {
-                                title: "清除已存储的 KEY",
+                                title: $l10n("Clear Saved Key"),
                                 handler: function () {
                                     $cache.set("userData", {
                                         "apiKey": null,
@@ -313,7 +284,7 @@ function compressPhoto(originalPhotoData) {
                                 }
                             },
                             {
-                                title: "取消",
+                                title: $l10n("Cancel"),
                                 handler: function () {
                                     stopScript();
                                 }
@@ -323,11 +294,11 @@ function compressPhoto(originalPhotoData) {
                     stopScript();
                 } else {
                     $ui.alert({
-                        title: "压缩失败",
+                        title: $l10n("Compression Failed"),
                         message: response,
                         actions: [
                             {
-                                title: "清除已存储的 KEY",
+                                title: $l10n("Clear Saved Key"),
                                 handler: function () {
                                     $cache.set("userData", {
                                         "apiKey": null,
@@ -336,7 +307,7 @@ function compressPhoto(originalPhotoData) {
                                 }
                             },
                             {
-                                title: "取消",
+                                title: $l10n("Cancel"),
                                 handler: function () {
                                     stopScript();
                                 }
@@ -471,9 +442,10 @@ if (($app.env !== $env.app) && ($app.env !== $env.action)) {
         }
     });
 } else {
-    $ui.alert("请在 JSBox 主应用中 或 通过分享菜单运行本脚本");
+    $ui.alert($l10n("Please run this script in JSBox app or share sheet."));
     stopScript();
 }
+
 
 
 
