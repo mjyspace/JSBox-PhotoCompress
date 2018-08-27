@@ -12,19 +12,13 @@ By [JunM](https://t.me/jun_m)
 使用说明：
 
 从相册的照片分享菜单运行 OR 直接在 JSBox 中运行。<br><br>
-
-PS:<br><br>
-由于 piexifjs 的限制，对 EXIF 的写入操作仅支持 JPG、JPEG 和 TIFF，所以本脚本不适用于 HEIF
-格式。
-
-如果有更完善的用于操作 EXIF 的 JS 库，欢迎反馈告知。<br><br>
-
-# TODO &use_clipboard=true
+<br>
+支持额外 URL Scheme 参数，如果在末尾加上 "&use_clipboard=true"，则会对最后一张图片进行处理。
 
 
 
 安装链接：
 
-[文件链接](https://github.com/mjyspace/JSBox/blob/master/Photo%20Compress/.output/Photo%20Compress.box?raw=true)
+[文件链接](https://github.com/mjyspace/JSBox-PhotoCompress/releases/download/v1.0/PhotoCompress.box)
 
-[JSBox 安装链接](https://xteko.com/redir?name=Photo%20Compress&url=https%3A%2F%2Fgithub.com%2Fmjyspace%2FJSBox%2Fblob%2Fmaster%2FPhoto%2520Compress%2F.output%2FPhoto%2520Compress.box%3Fraw%3Dtrue&author=JunM)
+[JSBox 安装链接](https://xteko.com/redir?name=Photo%20Compress&url=https%3A%2F%2Fgithub.com%2Fmjyspace%2FJSBox-PhotoCompress%2Freleases%2Fdownload%2Fv1.0%2FPhotoCompress.box&author=JunM)
